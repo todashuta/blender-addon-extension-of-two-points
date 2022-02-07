@@ -96,12 +96,20 @@ class ExtensionOfTwoPointsCustomMenu(bpy.types.Panel):
         layout.operator(ExtensionOfTwoPoints.bl_idname, text=ExtensionOfTwoPoints.bl_label)
 
 
+classes = (
+        ExtensionOfTwoPoints,
+        ExtensionOfTwoPointsCustomMenu,
+)
+
+
 def register():
-    bpy.utils.register_module(__name__)
+    for cls in classes:
+        bpy.utils.register_class(cls)
 
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)
 
 
 if __name__ == "__main__":
