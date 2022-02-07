@@ -43,7 +43,6 @@ class ExtensionOfTwoPoints(bpy.types.Operator):
     bl_idname = "object.extension_of_two_points"
     bl_label = "Extension Of Two Points"
 
-
     @classmethod
     def poll(cls, context):
         if context.object is None:
@@ -51,7 +50,6 @@ class ExtensionOfTwoPoints(bpy.types.Operator):
         if context.mode != "EDIT_MESH":
             return False
         return True
-
 
     def execute(self, context):
         scene = context.scene
@@ -85,15 +83,12 @@ class ExtensionOfTwoPointsCustomMenu(bpy.types.Panel):
     bl_category = "Tools"
     bl_context = "mesh_edit"
 
-
     @classmethod
     def poll(cls, context):
         return True
 
-
     def draw_header(self, context):
         layout = self.layout
-
 
     def draw(self, context):
         layout = self.layout
