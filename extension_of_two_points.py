@@ -47,9 +47,7 @@ class ExtensionOfTwoPoints(bpy.types.Operator):
     def poll(cls, context):
         if context.object is None:
             return False
-        if context.mode != "EDIT_MESH":
-            return False
-        return True
+        return context.mode == "EDIT_MESH" and context.tool_settings.mesh_select_mode[:] == (True, False, False)
 
     def execute(self, context):
         scene = context.scene
