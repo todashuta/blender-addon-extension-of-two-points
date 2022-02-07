@@ -19,15 +19,14 @@
 
 import bpy
 import bmesh
-from bpy.props import FloatProperty
 
 
 bl_info = {
     "name": "Extension Of Two Points",
     "author": "Toda Shuta",
-    "version": (1, 0, 0),
-    "blender": (2, 79, 0),
-    "location": "View3D > EditMode > ToolShelf > Tools > Extension Of Two Points",
+    "version": (1, 1, 0),
+    "blender": (2, 80, 0),
+    "location": "View3D > EditMode > Tool Bar > Tool > Extension Of Two Points",
     "description": "Extension Of Two Points",
     "warning": "",
     "wiki_url": "",
@@ -36,10 +35,7 @@ bl_info = {
 }
 
 
-bpy.types.Scene.extensionOfTwoPoints_length = FloatProperty(name="Length", default=1.0)
-
-
-class ExtensionOfTwoPoints(bpy.types.Operator):
+class EXTENSION_OF_TWO_POINTS_OT_main(bpy.types.Operator):
     bl_idname = "object.extension_of_two_points"
     bl_label = "Extension Of Two Points"
 
@@ -65,20 +61,22 @@ class ExtensionOfTwoPoints(bpy.types.Operator):
         bp = bm.select_history[-2]
         ep = bm.select_history[-1]
 
-        a = obj.matrix_world * bp.co
-        b = obj.matrix_world * ep.co
+        assert type(bp) is bmesh.types.BMVert and type(ep) is bmesh.types.BMVert, "Invalid Context"
+
+        a = obj.matrix_world @ bp.co
+        b = obj.matrix_world @ ep.co
         n = scene.extensionOfTwoPoints_length
         m = n+(a-b).length
-        scene.cursor_location = ((-n*a.x+m*b.x)/(m-n), (-n*a.y+m*b.y)/(m-n), (-n*a.z+m*b.z)/(m-n))
+        scene.cursor.location = ((-n*a.x+m*b.x)/(m-n), (-n*a.y+m*b.y)/(m-n), (-n*a.z+m*b.z)/(m-n))
 
         return {"FINISHED"}
 
 
-class ExtensionOfTwoPointsCustomMenu(bpy.types.Panel):
+class EXTENSION_OF_TWO_POINTS_PT_panel(bpy.types.Panel):
     bl_label = "Extension Of Two Points"
     bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
-    bl_category = "Tools"
+    bl_region_type = "UI"
+    bl_category = "Tool"
     bl_context = "mesh_edit"
 
     @classmethod
@@ -91,12 +89,12 @@ class ExtensionOfTwoPointsCustomMenu(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         layout.prop(context.scene, "extensionOfTwoPoints_length")
-        layout.operator(ExtensionOfTwoPoints.bl_idname, text=ExtensionOfTwoPoints.bl_label)
+        layout.operator(EXTENSION_OF_TWO_POINTS_OT_main.bl_idname, text=EXTENSION_OF_TWO_POINTS_OT_main.bl_label)
 
 
 classes = (
-        ExtensionOfTwoPoints,
-        ExtensionOfTwoPointsCustomMenu,
+        EXTENSION_OF_TWO_POINTS_OT_main,
+        EXTENSION_OF_TWO_POINTS_PT_panel,
 )
 
 
@@ -104,8 +102,13 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
+    bpy.types.Scene.extensionOfTwoPoints_length = bpy.props.FloatProperty(name="Length", default=1.0)
+
 
 def unregister():
+    if hasattr(bpy.types.Scene, "extensionOfTwoPoints_length"):
+        del bpy.types.Scene.extensionOfTwoPoints_length
+
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
 
